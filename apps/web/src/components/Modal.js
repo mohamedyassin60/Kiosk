@@ -1,11 +1,9 @@
 import { Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ReactComponent as ErrorSVG } from '../assets/icons/error.svg'
-import useModal from '../hooks/useModal'
 
-export default function Modal({ open }) {
-  const { data, hideModel } = useModal()
-  const { title, description, onSuccess } = data || {}
+export default function Modal({ open, options, hideModel }) {
+  const { title, description, onSuccess } = options || {}
   const cancelButtonRef = useRef(null)
 
   const handleSuccess = () => {
