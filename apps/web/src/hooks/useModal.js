@@ -1,19 +1,48 @@
-import React, { useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
+import Modal from '../components/Modal'
 
-const useModal = () => {
+const ModalContext = createContext({})
+
+const ModalProvider = ({ children }) => {
+  const [open, setOpen] = useState(false)
   const [data, setData] = useState(null)
 
   const showModel = (options, onSuccess) => {
     setData({ ...options, onSuccess })
+    setOpen(true)
   }
-  const hideModel = () => setData(null)
+  const hideModel = () => setOpen(false)
 
-  return {
-    options: data,
-    open: !!data,
-    showModel,
-    hideModel
-  }
+  const contextValue = useMemo(
+    () => ({
+      options: data,
+      open,
+      showModel,
+      hideModel
+    }),
+    [open, data]
+  )
+
+  useEffect(() => {
+    if (!open && !!data) {
+      setTimeout(() => setData(null), 300)
+    }
+  }, [open])
+
+  return (
+    <ModalContext.Provider value={contextValue}>
+      {children}
+      <Modal open={open} options={data} hideModel={hideModel} />
+    </ModalContext.Provider>
+  )
 }
 
-export default useModal
+const useModal = () => useContext(ModalContext)
+
+export { ModalProvider, useModal }

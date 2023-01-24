@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mocked from '../services/data'
-import useModal from '../hooks/useModal'
-import Modal from '../components/Modal'
+import { useModal } from '../hooks/useModal'
 import BasePage from '../components/BasePage'
 
 const Home = () => {
   const [kiosks, setKiosks] = useState(mocked)
   const navigate = useNavigate()
-  const { open, options, showModel, hideModel } = useModal()
+  const { showModel } = useModal()
+
+  const onDelete = (id) => {}
 
   const handleAdd = () => navigate('/add')
 
@@ -21,9 +22,7 @@ const Home = () => {
         description:
           'Are you sure you want to delete this kiosk? This action cannot be undone.'
       },
-      () => {
-        alert('Deleted')
-      }
+      () => onDelete(id)
     )
   }
 
@@ -95,7 +94,6 @@ const Home = () => {
           )
         )}
       </div>
-      <Modal open={open} options={options} hideModel={hideModel} />
     </BasePage>
   )
 }
