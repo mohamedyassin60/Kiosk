@@ -10,6 +10,9 @@
     },
     "dev": {
       "cache": false
+    },
+    "globalDependencies": {
+      "env": ["API_URL"]
     }
   }
 }

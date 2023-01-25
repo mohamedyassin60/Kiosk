@@ -1,22 +1,48 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import BasePage from '../components/BasePage'
 import KioskForm from '../components/KioskForm'
-import mocked from '../services/data'
 import Error404 from './Error404'
+import { get, put } from '../services/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 const EditKiosk = () => {
-  const [oldValues, setOldValues] = useState(null)
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const params = useParams()
 
-  const onEdit = (data) => {
-    console.log('onSubmit', data)
-  }
+  const { data, isFetching, isError } = useQuery(
+    ['kiosk'],
+    () => get(`kiosk/${params?.id}`),
+    {
+      enabled: !!params?.id
+    }
+  )
+  const oldValues = useMemo(
+    () => ({
+      id: params.id,
+      ...data
+    }),
+    [data]
+  )
 
-  useEffect(() => {
-    const kiosk = mocked.find(({ id }) => id === params?.id || '')
-    setOldValues(kiosk)
-  }, [params])
+  const onEdit = async (data) => {
+    console.log('onEdit', data)
+    try {
+      await put(`kiosks/${params.id}`, {
+        body: data
+      })
+      await queryClient.invalidateQueries(['kiosks'])
+      // const _kioskList = [...kioskList]
+      // const kioskIdx = kioskList.findIndex((x) => x.id === params.id)
+      // const oldData = kioskList[kioskIdx]
+      // _kioskList[kioskIdx] = { ...oldData, ...data }
+      // setTodoList(_kioskList)
+      navigate(-1)
+    } catch (e) {
+      console.error('onDelete', e)
+    }
+  }
 
   const header = useMemo(
     () => (
@@ -32,7 +58,7 @@ const EditKiosk = () => {
   return (
     <BasePage header={header}>
       <KioskForm
-        isFetching={!oldValues}
+        isFetching={isFetching || isError}
         oldValues={oldValues}
         onSubmit={onEdit}
       />

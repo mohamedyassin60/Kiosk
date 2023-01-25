@@ -1,15 +1,37 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import mocked from '../services/data'
 import { useModal } from '../hooks/useModal'
 import BasePage from '../components/BasePage'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { dlt, get } from '../services/api'
 
 const Home = () => {
-  const [kiosks, setKiosks] = useState(mocked)
   const navigate = useNavigate()
   const { showModel } = useModal()
+  const queryClient = useQueryClient()
 
-  const onDelete = (id) => {}
+  const { data } = useQuery(['kiosks'], () => get('kiosks'))
+  const kioskList = useMemo(
+    () =>
+      Object.keys(data || {}).map((key) => ({
+        id: key,
+        ...data[key]
+      })),
+    [data]
+  )
+
+  const onDelete = async (id) => {
+    try {
+      await dlt(`kiosks/${id}`)
+      await queryClient.invalidateQueries(['kiosks'])
+      // const kioskIdx = kioskList.findIndex((x) => x.id === id)
+      // const _kioskList = [...kioskList]
+      // _kioskList.splice(kioskIdx, 1)
+      // setTodoList(_kioskList)
+    } catch (e) {
+      console.error('onDelete', e)
+    }
+  }
 
   const handleAdd = () => navigate('/add')
 
@@ -41,7 +63,7 @@ const Home = () => {
   return (
     <BasePage header={header}>
       <div className="w-full">
-        {kiosks.map(
+        {kioskList.map(
           ({
             id,
             serialKey,
@@ -70,10 +92,10 @@ const Home = () => {
               </div>
               <div className="flex flex-col justify-center">
                 <div className="text-md text-gray-500">
-                  Opens at {`${storeOpensAt}:00`}
+                  Opens at {storeOpensAt}
                 </div>
                 <div className="text-md text-gray-500">
-                  Closes at {`${storeClosesAt}:00`}
+                  Closes at {storeClosesAt}
                 </div>
                 <div className="flex mt-2">
                   <button

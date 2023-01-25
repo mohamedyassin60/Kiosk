@@ -97,7 +97,7 @@ const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
       </div>
       <button
         className="px-6 py-4 my-5 font-bold text-white bg-newGreen rounded-full"
-        disabled={isSubmitting}
+        disabled={isSubmitting || isFetching}
         onClick={handleSubmit(onSubmit)}
       >
         Submit

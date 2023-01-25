@@ -1,10 +1,27 @@
 import React, { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BasePage from '../components/BasePage'
 import KioskForm from '../components/KioskForm'
+import { post } from '../services/api'
+import { useQueryClient } from '@tanstack/react-query'
 
 const AddKiosk = () => {
-  const onAdd = (data) => {
-    console.log('onSubmit', data)
+  // const [kioskList, setTodoList] = useRecoilState(kioskListState)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const onAdd = async (data) => {
+    console.log('onAdd', data)
+    try {
+      await post(`kiosks`, {
+        body: data
+      })
+      await queryClient.invalidateQueries(['kiosks'])
+      // setTodoList([...kioskList, { id: '13124', ...data }])
+      navigate(-1)
+    } catch (e) {
+      console.error('onDelete', e)
+    }
   }
 
   const header = useMemo(

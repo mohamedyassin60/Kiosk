@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const instance = async (method, url, extras) => {
-  let fUrl = `${process.env.REACT_APP_API_URL}/${url}`
+  let fUrl = `http://localhost:3001/${url}`
 
   const headers = {
     Accept: 'application/json',
