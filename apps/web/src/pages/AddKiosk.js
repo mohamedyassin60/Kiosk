@@ -20,7 +20,7 @@ const AddKiosk = () => {
       // setTodoList([...kioskList, { id: '13124', ...data }])
       navigate(-1)
     } catch (e) {
-      console.error('onDelete', e)
+      console.error('onAdd', e)
     }
   }
 

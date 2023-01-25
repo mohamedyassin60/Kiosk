@@ -4,11 +4,24 @@ import { useModal } from '../hooks/useModal'
 import BasePage from '../components/BasePage'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { dlt, get } from '../services/api'
+import useWebSocket from 'react-use-websocket'
 
 const Home = () => {
   const navigate = useNavigate()
   const { showModel } = useModal()
   const queryClient = useQueryClient()
+
+  useWebSocket('ws://localhost:3002', {
+    onOpen: () => {
+      console.log('WebSocket connection established.')
+    },
+    onMessage: async ({ data }) => {
+      console.log('WebSocket sent', data)
+      if (data === 'update') {
+        await queryClient.invalidateQueries(['kiosks'])
+      }
+    }
+  })
 
   const { data } = useQuery(['kiosks'], () => get('kiosks'))
   const kioskList = useMemo(

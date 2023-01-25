@@ -40,7 +40,7 @@ const EditKiosk = () => {
       // setTodoList(_kioskList)
       navigate(-1)
     } catch (e) {
-      console.error('onDelete', e)
+      console.error('onEdit', e)
     }
   }
 
