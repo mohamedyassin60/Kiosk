@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import InputForm from './InputForm'
 import { get } from '../services/api'
+import { checkHours } from '../helpers'
 
-const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
+const KioskForm = ({ onSubmit, isFetching = false, oldValues = {} }) => {
   const requiredField = 'Required field *'
   const atLeast = 'must be at least 4 characters'
   const atMost = 'must be at most'
@@ -48,33 +49,18 @@ const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
     reValidateMode: 'onBlur'
   })
 
-  const checkHours = () => {
-    const { storeOpensAt, storeClosesAt } = getValues()
-    if (!storeOpensAt || !storeClosesAt) {
-      setError('storeClosesAt', null)
-      return true
-    }
-    const [openHrs, openMins] = storeOpensAt.split(':')
-    const [closeHrs, closeMins] = storeClosesAt.split(':')
-    if (openHrs > closeHrs || (openHrs === closeHrs && openMins >= closeMins)) {
-      setError('storeClosesAt', {
-        message: 'Closing time should be after opening time'
-      })
-      return false
-    }
-    setError('storeClosesAt', null)
-    return true
-  }
-
   const handleForm = async (data) => {
-    const verified = checkHours(data)
-    if (!verified) return
-    if (!!oldValues && oldValues.serialKey === data.serialKey) {
-      setError('serialKey', null)
-      onSubmit(data)
-      return
-    }
     try {
+      if (!checkHours(data, setError)) return
+
+      // Check if updating kiosk and serial key did not change
+      if (!!oldValues && oldValues.serialKey === data.serialKey) {
+        setError('serialKey', null)
+        onSubmit(data)
+        return
+      }
+
+      // Validate that serial key is unique
       const isValid = await get(`kiosk/checkKey/${data.serialKey}`)
       if (isValid) {
         setError('serialKey', null)
@@ -94,7 +80,7 @@ const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
 
   useEffect(() => {
     const data = getValues()
-    checkHours(data)
+    checkHours(data, setError)
   }, [isValidating, isSubmitting])
 
   useEffect(() => {
@@ -144,7 +130,6 @@ const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
             errors={errors}
             register={register}
             disabled={!!isFetching}
-            validation={{}}
           />
         </div>
       </div>
@@ -160,6 +145,8 @@ const KioskForm = ({ isFetching, oldValues, onSubmit }) => {
 }
 
 KioskForm.propTypes = {
+  isFetching: PropTypes.bool,
+  oldValues: PropTypes.object,
   onSubmit: PropTypes.func.isRequired
 }
 

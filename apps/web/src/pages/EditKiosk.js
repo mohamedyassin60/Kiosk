@@ -27,17 +27,11 @@ const EditKiosk = () => {
   )
 
   const onEdit = async (data) => {
-    console.log('onEdit', data)
     try {
       await put(`kiosks/${params.id}`, {
         body: data
       })
       await queryClient.invalidateQueries(['kiosks'])
-      // const _kioskList = [...kioskList]
-      // const kioskIdx = kioskList.findIndex((x) => x.id === params.id)
-      // const oldData = kioskList[kioskIdx]
-      // _kioskList[kioskIdx] = { ...oldData, ...data }
-      // setTodoList(_kioskList)
       navigate(-1)
     } catch (e) {
       console.error('onEdit', e)

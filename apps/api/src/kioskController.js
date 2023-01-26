@@ -185,8 +185,8 @@ const editKiosk = async (req, res) => {
       serialKey,
       description,
       storeOpensAt,
-      storeClosesAt
-      // isKioskClosed: checkIfKioskClosed(storeOpensAt, storeClosesAt)
+      storeClosesAt,
+      isKioskClosed: checkIfKioskClosed(storeOpensAt, storeClosesAt)
     }
     await saveDBFile(kiosks)
     return res.status(200).json({
