@@ -1,6 +1,6 @@
-# Turborepo starter
+# Kiosk Management App
 
-This is an official Yarn v1 starter turborepo.
+This monorepo is built using turborepo.
 
 ## What's inside?
 
